@@ -4,6 +4,7 @@ import 'package:login_social_example/feature/social_login/domain/entities/user_e
 
 abstract class AuthRepository {
   Future<Either<Failure, UserEntity>> signInWithGoogle();
+  Future<Either<Failure, UserEntity>> signInWithFacebook();
   Future<Either<Failure, void>> signOut();
   Either<Failure, UserEntity?> getCurrentUser();
 }

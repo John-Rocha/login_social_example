@@ -9,9 +9,7 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Login Social'),
-      ),
+      appBar: AppBar(title: const Text('Login Social')),
       body: BlocConsumer<AuthCubit, AuthState>(
         listener: (context, state) {
           if (state is AuthError) {
@@ -25,9 +23,7 @@ class LoginPage extends StatelessWidget {
         },
         builder: (context, state) {
           if (state is AuthLoading) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
+            return const Center(child: CircularProgressIndicator());
           }
 
           return Center(
@@ -35,11 +31,7 @@ class LoginPage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               spacing: 24,
               children: [
-                const Icon(
-                  Icons.login,
-                  size: 64,
-                  color: Colors.blue,
-                ),
+                const Icon(Icons.login, size: 64, color: Colors.blue),
                 const Text(
                   'Faça login para continuar',
                   style: TextStyle(fontSize: 18),
@@ -52,6 +44,21 @@ class LoginPage extends StatelessWidget {
                         },
                   icon: const Icon(Icons.login),
                   label: const Text('Login with Google'),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 12,
+                    ),
+                  ),
+                ),
+                ElevatedButton.icon(
+                  onPressed: state is AuthLoading
+                      ? null
+                      : () {
+                          context.read<AuthCubit>().signInWithFacebook();
+                        },
+                  icon: const Icon(Icons.facebook),
+                  label: const Text('Login with Facebook'),
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 24,
