@@ -18,6 +18,11 @@ class GoogleSignInServiceImpl implements GoogleSignInService {
 
   @override
   Future<UserCredential> signInWithGoogle() async {
+    // Inicializar o GoogleSignIn com o serverClientId
+    await _googleSignIn.initialize(
+      serverClientId: '367781060028-ucft3oj5uhflgcmnu8k9s337f42j7pvm.apps.googleusercontent.com',
+    );
+
     // Autenticar o usuário
     final GoogleSignInAccount googleUser = await _googleSignIn.authenticate();
 
