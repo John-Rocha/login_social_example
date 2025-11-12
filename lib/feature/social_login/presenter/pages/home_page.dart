@@ -12,9 +12,7 @@ class HomePage extends StatelessWidget {
       builder: (context, state) {
         if (state is! AuthAuthenticated) {
           return const Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(),
-            ),
+            body: Center(child: CircularProgressIndicator()),
           );
         }
 
@@ -56,10 +54,7 @@ class HomePage extends StatelessWidget {
                 ),
                 Text(
                   user.email ?? 'Sem email',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey,
-                  ),
+                  style: const TextStyle(fontSize: 16, color: Colors.grey),
                 ),
                 const SizedBox(height: 24),
                 ElevatedButton.icon(
