@@ -4,6 +4,7 @@ import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 abstract class FacebookSignInService {
   Future<UserCredential> signInWithFacebook();
   Future<void> signOut();
+  Future<Map<String, dynamic>> getUserData();
 }
 
 class FacebookSignInServiceImpl implements FacebookSignInService {
@@ -43,5 +44,14 @@ class FacebookSignInServiceImpl implements FacebookSignInService {
   @override
   Future<void> signOut() async {
     await Future.wait([_firebaseAuth.signOut(), _facebookAuth.logOut()]);
+  }
+
+  @override
+  Future<Map<String, dynamic>> getUserData() async {
+    // Busca os dados do usuário no Facebook incluindo foto em alta resolução
+    final userData = await _facebookAuth.getUserData(
+      fields: "id,name,email,picture.width(500).height(500)",
+    );
+    return userData;
   }
 }

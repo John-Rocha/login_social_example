@@ -13,7 +13,7 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<void> _checkCurrentUser() async {
-    final result = _authRepository.getCurrentUser();
+    final result = await _authRepository.getCurrentUser();
 
     result.fold(
       (failure) => emit(const AuthUnauthenticated()),

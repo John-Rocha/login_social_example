@@ -17,9 +17,9 @@ class AuthRepositoryImpl implements AuthRepository {
     required GoogleSignInService googleSignInService,
     required FacebookSignInService facebookSignInService,
     required FirebaseAuth firebaseAuth,
-  })  : _googleSignInService = googleSignInService,
-        _facebookSignInService = facebookSignInService,
-        _firebaseAuth = firebaseAuth;
+  }) : _googleSignInService = googleSignInService,
+       _facebookSignInService = facebookSignInService,
+       _firebaseAuth = firebaseAuth;
 
   @override
   Future<Either<Failure, UserEntity>> signInWithGoogle() async {
@@ -52,7 +52,24 @@ class AuthRepositoryImpl implements AuthRepository {
         return const Left(AuthFailure('Falha ao fazer login'));
       }
 
-      final userModel = UserModel.fromFirebaseUser(userCredential.user!);
+      // Busca os dados do usuário do Facebook para obter a foto em alta resolução
+      String? facebookPhotoUrl;
+      try {
+        final facebookData = await _facebookSignInService.getUserData();
+        // A foto está em: facebookData['picture']['data']['url']
+        if (facebookData['picture'] != null &&
+            facebookData['picture']['data'] != null) {
+          facebookPhotoUrl = facebookData['picture']['data']['url'];
+        }
+      } catch (e) {
+        // Se falhar ao buscar a foto do Facebook, usa a foto do Firebase
+        print('Erro ao buscar foto do Facebook: $e');
+      }
+
+      final userModel = UserModel.fromFirebaseUser(
+        userCredential.user!,
+        facebookPhotoUrl: facebookPhotoUrl,
+      );
       return Right(userModel.toEntity());
     } on CancelledByUserException {
       return const Left(CancelledByUserFailure());
@@ -80,14 +97,36 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Either<Failure, UserEntity?> getCurrentUser() {
+  Future<Either<Failure, UserEntity?>> getCurrentUser() async {
     try {
       final user = _firebaseAuth.currentUser;
       if (user == null) {
         return const Right(null);
       }
 
-      final userModel = UserModel.fromFirebaseUser(user);
+      // Verifica se o usuário está logado com Facebook para buscar a foto em alta resolução
+      String? facebookPhotoUrl;
+      final isFacebookUser = user.providerData.any(
+        (provider) => provider.providerId == 'facebook.com',
+      );
+
+      if (isFacebookUser) {
+        try {
+          final facebookData = await _facebookSignInService.getUserData();
+          if (facebookData['picture'] != null &&
+              facebookData['picture']['data'] != null) {
+            facebookPhotoUrl = facebookData['picture']['data']['url'];
+          }
+        } catch (e) {
+          // Se falhar ao buscar a foto do Facebook, usa a foto do Firebase
+          print('Erro ao buscar foto do Facebook: $e');
+        }
+      }
+
+      final userModel = UserModel.fromFirebaseUser(
+        user,
+        facebookPhotoUrl: facebookPhotoUrl,
+      );
       return Right(userModel.toEntity());
     } catch (e) {
       return Left(AuthFailure('Erro ao obter usuário: ${e.toString()}'));

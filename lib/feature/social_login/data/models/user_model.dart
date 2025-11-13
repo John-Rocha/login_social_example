@@ -9,12 +9,12 @@ class UserModel extends UserEntity {
     super.photoUrl,
   });
 
-  factory UserModel.fromFirebaseUser(User user) {
+  factory UserModel.fromFirebaseUser(User user, {String? facebookPhotoUrl}) {
     return UserModel(
       id: user.uid,
       email: user.email,
       displayName: user.displayName,
-      photoUrl: user.photoURL,
+      photoUrl: facebookPhotoUrl ?? user.photoURL,
     );
   }
 
